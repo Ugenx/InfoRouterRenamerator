@@ -26,10 +26,14 @@ namespace InfoRouterRenamerator
                 ? "NOLOAD"
                 : LoadNumber;
 
+            var filename = OriginalFileName.Contains("tif")
+                ? OriginalFileName.Replace("tif", "pdf")
+                : OriginalFileName;
+
             return string.Format(FilenameFormat,
                 prefix,
                 DriverName,
-                OriginalFileName);
+                filename);
         }
 
         public static OurDocument LoadFromElement(XElement element)
