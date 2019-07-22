@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.Threading.Tasks;
+using ImageMagick;
 using TestServiceThing;
 
 namespace InfoRouterRenamerator
@@ -73,10 +74,16 @@ namespace InfoRouterRenamerator
             {
                 var file = await _client.DownloadDocumentAsync(_ticket, doc.RemoteDocumentPath);
                 Debug.WriteLine($"Downloaded {doc.OriginalFileName}");
-                await File
-                    .WriteAllBytesAsync(Path.Combine(localDestinationFolder, doc.LocalFileName), file.DownloadDocumentResult)
-                    .ConfigureAwait(false);
+                await SaveAsPdf(file, doc, localDestinationFolder).ConfigureAwait(false);
                 Debug.WriteLine($"Saved {doc.LocalFileName}");
+            }
+        }
+
+        private async Task SaveAsPdf(DownloadDocumentResponse responseDoc, OurDocument ourDoc, string destination)
+        {
+            using (MagickImage image = new MagickImage(responseDoc.DownloadDocumentResult))
+            {
+                image.Write(Path.Combine(destination, ourDoc.LocalFileName));
             }
         }
     }
